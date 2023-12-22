@@ -3,14 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Unity.VisualScripting;
 #if UNITY_EDITOR // => Ignore from here to next endif if not in editor
 using UnityEditor;
-using UnityEditor.VersionControl;
-using UnityEditorInternal;
 #endif
 using UnityEngine;
-using UnityEngine.XR;
 
 namespace ModelReplacement.AvatarBodyUpdater
 {
@@ -246,7 +242,7 @@ namespace ModelReplacement.AvatarBodyUpdater
         public void CalculateScale()
         {
             if(playerObject == null) return;
-            base.transform.localScale = ((new Vector3(1, 0, 0)) * baseScale.x * rootScale.x + (new Vector3(0, 1, 0)) * baseScale.y * rootScale.y + (new Vector3(0, 0, 1)) * baseScale.z * rootScale.z);
+            transform.localScale = Vector3.Scale(baseScale,rootScale);
         }
 
         public void CalculateRotationOffsets()
@@ -308,7 +304,7 @@ namespace ModelReplacement.AvatarBodyUpdater
             CalculateScale();
             // playerObject.GetComponentsInChildren<Renderer>().ToList().ForEach(r => r.enabled = false);
             animator = base.GetComponentInChildren<Animator>();
-            Debug.Log($"Bones {playerObject.GetComponentInChildren<SkinnedMeshRenderer>().bones.Count()}");
+            //Debug.Log($"Bones {playerObject.GetComponentInChildren<SkinnedMeshRenderer>().bones.Count()}");
 
 
             itemHolder.transform.localPosition = itemPositonOffset;

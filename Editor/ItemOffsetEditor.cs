@@ -12,33 +12,45 @@ public class OffsetBuilderEditor : Editor
         OffsetBuilder t = (OffsetBuilder)target;
 
         EditorGUILayout.LabelField("Base Model Properties");
-        t.rootPositionOffset = EditorGUILayout.Vector3Field("Root Position Offset", t.rootPositionOffset);
-        EditorGUILayout.Vector3Field("Root Scale", t.rootScale);
+        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(OffsetBuilder.rootPositionOffset)));
+        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(OffsetBuilder.rootScale)));
 
         EditorGUILayout.Separator();
         EditorGUILayout.LabelField("Item Transform Properties");
-        t.itemPositonOffset = EditorGUILayout.Vector3Field("Item Position Offset", t.itemPositonOffset);
-        t.itemRotationOffset.eulerAngles = EditorGUILayout.Vector3Field("Item Rotation Offset", t.itemRotationOffset.eulerAngles);
+        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(OffsetBuilder.itemPositonOffset)), new GUIContent("Item Position Offset"));
+        
+        // This is kinda gross, but manually setting variables without using serialized properties is pretty hard.
+        EditorGUI.BeginChangeCheck();
+        var check = EditorGUILayout.Vector3Field("Item Rotation Offset", t.itemRotationOffset.eulerAngles);
+        // Equals avoids the rounding error leniency, Vector3Field doesn't tell us if it has changed...
+        if (EditorGUI.EndChangeCheck())
+        {
+            Undo.RecordObject(t, "Changed rotation offset");
+            t.itemRotationOffset.eulerAngles = check;
+            EditorUtility.SetDirty(t);
+        }
 
         EditorGUILayout.Separator();
         EditorGUILayout.LabelField("AssetBundle Properties");
-        t.assetBundleName = EditorGUILayout.TextField("Asset Bundle Name" ,t.assetBundleName);
-        t.assetName = EditorGUILayout.TextField("Asset Name", t.assetName);
+        
+        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(OffsetBuilder.assetBundleName)));
+        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(OffsetBuilder.assetName)));
         if (GUILayout.Button("Build AssetBundle"))
         {
             t.SaveAssetBundles();
         }
-
         EditorGUILayout.Separator();
         EditorGUILayout.LabelField("Controls");
-        t.renderPlayer = EditorGUILayout.Toggle("Render Player",t.renderPlayer);
-        t.renderItem = EditorGUILayout.Toggle("Render Item", t.renderItem);
+        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(OffsetBuilder.renderPlayer)));
+        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(OffsetBuilder.renderItem)));
         if (GUILayout.Button("ReZero Model Position"))
         {
+            Undo.RecordObject(t, "Calculated root offset");
             t.CalculateRootOffset();
+            EditorUtility.SetDirty(t);
         }
 
-
+        serializedObject.ApplyModifiedProperties();
     }
 
 
@@ -56,40 +68,34 @@ public class OffsetBuilderEditor : Editor
 
 
         EditorGUI.BeginChangeCheck();
-        if(Tools.current == Tool.Move)
-        {
-            rootOff = Handles.PositionHandle(t.animator.GetBoneTransform(HumanBodyBones.Hips).position, Quaternion.identity);
-            itemOff = Handles.PositionHandle(t.itemHolder.transform.position, t.itemHolder.transform.rotation * itemRot);
-        }
-        if (Tools.current == Tool.Scale)
-        {
-             rootSca = Handles.ScaleHandle(rootSca, t.rootTransform.position, t.rootTransform.rotation);
-        }
-        if (Tools.current == Tool.Rotate)
-        {
-            itemRot = Handles.RotationHandle(t.itemHolder.transform.rotation * itemRot, t.itemHolder.transform.position);
+        switch (Tools.current) {
+            case Tool.Move:
+                rootOff = Handles.PositionHandle(t.animator.GetBoneTransform(HumanBodyBones.Hips).position, Quaternion.identity);
+                itemOff = Handles.PositionHandle(t.itemHolder.transform.position, t.itemHolder.transform.rotation * itemRot);
+                break;
+            case Tool.Scale:
+                rootSca = Handles.ScaleHandle(rootSca, t.rootTransform.position, t.rootTransform.rotation);
+                break;
+            case Tool.Rotate:
+                itemRot = Handles.RotationHandle(t.itemHolder.transform.rotation * itemRot, t.itemHolder.transform.position);
+                break;
         }
 
-        if (EditorGUI.EndChangeCheck())
-        {
-            Undo.RecordObject(target, "Rotated RotateAt Point");
-            if (Tools.current == Tool.Move)
-            {
+        if (!EditorGUI.EndChangeCheck()) return;
+        Undo.RecordObject(target, "Rotated RotateAt Point");
+        switch (Tools.current) {
+            case Tool.Move:
                 t.rootPositionOffset = t.rootTransform.InverseTransformVector(rootOff - t.animator.GetBoneTransform(HumanBodyBones.Hips).position) + t.rootPositionOffset;
 
                 t.itemHolder.transform.SetPositionAndRotation(itemOff, t.itemHolder.transform.rotation);
                 t.itemPositonOffset = t.itemHolder.transform.localPosition;
-            }
-            if (Tools.current == Tool.Scale)
-            {
+                break;
+            case Tool.Scale:
                 t.rootScale = rootSca;
-                
-            }
-            if (Tools.current == Tool.Rotate)
-            {
+                break;
+            case Tool.Rotate:
                 t.itemRotationOffset = Quaternion.Inverse(t.itemHolder.transform.rotation) * itemRot;
-            }
-            
+                break;
         }
     }
 
