@@ -2,6 +2,13 @@
 A SDK to simplify creating character model replacements in Lethal Company. [See the API repo](https://github.com/BunyaPineTree/LethalCompany_ModelReplacementAPI) to learn how model replacement works. 
 * Note: Not an actual SDK yet, just a tool for creating ModelReplacementAPI compliant assetbundles
 
+How to Install
+-
+- Have Unity 2022.3.9f1 installed, with a new HDRP project open.
+- Open the Package Manager within Unity by hitting Window->Package Manager at the top.
+- Hit *"Add package from git url..."*, then punch the following in: `https://github.com/BunyaPineTree/LethalCompany_ModelReplacementSDK.git#upm`
+- Make sure to update it regularly by hitting the "Update" button!
+
 Planned Functionality
 -
 A "Setup Project" button that performs the following
@@ -32,9 +39,3 @@ Possible Solutions to Above
 - Under above, each OffsetBuilder component would not allow you to type an asset bundle name, but instead select a project.
 - This solution may be overbuilt
 
-How to Install
--
-- Have Unity 2022.3.9f1 installed, with a new HDRP project open.
-- Open the Package Manager within Unity by hitting Window->Package Manager at the top.
-- Hit *"Add package from git url..."*, then punch the following in: `https://github.com/BunyaPineTree/LethalCompany_ModelReplacementSDK.git#upm`
-- Make sure to update it regularly by hitting the "Update" button!
