@@ -8,7 +8,7 @@ namespace Assets.Editor
 {
     public class SetupAvatarOffset
     {
-        [MenuItem("ModelReplacementAPI/Setup Model")]
+        [MenuItem("ModelReplacementSDK/Setup Model")]
         static void setupModel()
         {
             var obj = Selection.activeObject;
@@ -46,7 +46,7 @@ namespace Assets.Editor
 
     public class BuildBundles
     {
-        [MenuItem("ModelReplacementAPI/Build AssetBundles")]
+        [MenuItem("ModelReplacementSDK/Build AssetBundles")]
         static void setupModel()
         {
 
