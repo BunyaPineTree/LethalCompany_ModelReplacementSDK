@@ -11,7 +11,7 @@ namespace Assets.Editor
         [MenuItem("ModelReplacementSDK/Setup Model")]
         static void setupModel()
         {
-            var obj = Selection.activeObject;
+            var obj = Selection.activeObject as GameObject;
             if (obj == null) { return; }
             if (!obj.GetComponentInChildren<SkinnedMeshRenderer>())
             {
