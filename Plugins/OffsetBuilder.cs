@@ -60,11 +60,11 @@ namespace ModelReplacement.AvatarBodyUpdater
                 yield break; 
             }
             yield return null;
-            if (!Directory.Exists("Assets/ModelReplacementAPI/AssetsToBuild"))
+            if (!Directory.Exists("Assets/ModelReplacementSDK/AssetsToBuild"))
             {
-                Directory.CreateDirectory("Assets/ModelReplacementAPI/AssetsToBuild");
+                Directory.CreateDirectory("Assets/ModelReplacementSDK/AssetsToBuild");
             }
-            string AssetPath = "Assets/ModelReplacementAPI/AssetsToBuild/" + assetName + ".prefab";
+            string AssetPath = "Assets/ModelReplacementSDK/AssetsToBuild/" + assetName + ".prefab";
             PrefabUtility.SaveAsPrefabAsset(gameObject, AssetPath);
             yield return null;
 
