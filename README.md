@@ -31,3 +31,10 @@ Possible Solutions to Above
   - Assembly Name, Mod GUID, name, possibly version
 - Under above, each OffsetBuilder component would not allow you to type an asset bundle name, but instead select a project.
 - This solution may be overbuilt
+
+How to Install
+-
+- Have Unity 2022.3.9f1 installed, with a new HDRP project open.
+- Open the Package Manager within Unity by hitting Window->Package Manager at the top.
+- Hit *"Add package from git url..."*, then punch the following in: `https://github.com/BunyaPineTree/LethalCompany_ModelReplacementSDK.git#upm`
+- Make sure to update it regularly by hitting the "Update" button!
