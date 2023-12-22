@@ -8,7 +8,7 @@ A "Setup Project" button that performs the following
 - Requests a directory to place a project folder.
 - Searches for the default Lethal Company directory `C:\Program Files (x86)\Steam\steamapps\common\Lethal Company\`, if missing it will prompt the user to enter this directory.
 - Contains a basic model replacement mod template with .csproj, Plugin.cs, BasicModelReplacements.cs
-  - .csproj: Auto-populates the LC directory, auto-embeds the assetbundle into resources, contains all other necessary items to build the project. This can be done with replaceable strings $assetbundlename$ $LCdir$, etc... in the template.
+  - .csproj: Auto-populates the LC directory, auto-embeds the assetbundle into resources, contains all other necessary items to build the project. This can be done with replaceable strings \\$assetbundlename$ \\$LCdir$, etc... in the template.
   - Plugin.cs: Auto-populates the assetbundle name into the Assets class and mod info in the PluginInfo class, contains basic config.
   - BasicModelReplacements.cs: For each gameObject with OffsetBuilder in the designated build folder, create a ModelReplacement class with name derived from the asset name, and populate the asset name in `LoadAssetsAndReturnModel()`
 - Copies all scripts from a designated Scripts folder into a Scripts folder in the VS project folder.
