@@ -3,14 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Unity.VisualScripting;
 #if UNITY_EDITOR // => Ignore from here to next endif if not in editor
 using UnityEditor;
-using UnityEditor.VersionControl;
-using UnityEditorInternal;
 #endif
 using UnityEngine;
-using UnityEngine.XR;
 
 namespace ModelReplacement.AvatarBodyUpdater
 {
@@ -114,12 +110,12 @@ namespace ModelReplacement.AvatarBodyUpdater
         void Start()
         {
             if (playerObject != null) { return; }
-            UnityEngine.Object pPrefab = AssetDatabase.LoadAssetAtPath("Assets/ModelReplacementAPI/Player.prefab", typeof(GameObject)); 
-            UnityEngine.Object wPrefab = AssetDatabase.LoadAssetAtPath("Assets/ModelReplacementAPI/WalkieTalkie.prefab", typeof(GameObject));
-            UnityEngine.Object hPrefab = AssetDatabase.LoadAssetAtPath("Assets/ModelReplacementAPI/Scavenger.prefab", typeof(GameObject));
-            playerObject = (GameObject)PrefabUtility.InstantiatePrefab(pPrefab);
-            item = (GameObject)PrefabUtility.InstantiatePrefab(wPrefab);
-            playerHumanoid = (GameObject)PrefabUtility.InstantiatePrefab(hPrefab);
+            UnityEngine.Object playerPrefab = AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath("b9abac1e5ff1cb94483598ed4877ae91"), typeof(GameObject)); 
+            UnityEngine.Object walkieTalkiePrefab = AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath("7e73454e50f98f347aaea162c4ebe382"), typeof(GameObject));
+            UnityEngine.Object scavengerPrefab = AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath("a024259985699eb4fb6d4585e872c37c"), typeof(GameObject));
+            playerObject = (GameObject)PrefabUtility.InstantiatePrefab(playerPrefab);
+            item = (GameObject)PrefabUtility.InstantiatePrefab(walkieTalkiePrefab);
+            playerHumanoid = (GameObject)PrefabUtility.InstantiatePrefab(scavengerPrefab);
             playerObject.name = playerObject.name + $"({base.name})";
             item.name = item.name + $"({base.name})";
             playerHumanoid.name = playerHumanoid.name + $"({base.name})";
@@ -246,7 +242,7 @@ namespace ModelReplacement.AvatarBodyUpdater
         public void CalculateScale()
         {
             if(playerObject == null) return;
-            base.transform.localScale = ((new Vector3(1, 0, 0)) * baseScale.x * rootScale.x + (new Vector3(0, 1, 0)) * baseScale.y * rootScale.y + (new Vector3(0, 0, 1)) * baseScale.z * rootScale.z);
+            transform.localScale = Vector3.Scale(baseScale,rootScale);
         }
 
         public void CalculateRotationOffsets()
@@ -308,7 +304,7 @@ namespace ModelReplacement.AvatarBodyUpdater
             CalculateScale();
             // playerObject.GetComponentsInChildren<Renderer>().ToList().ForEach(r => r.enabled = false);
             animator = base.GetComponentInChildren<Animator>();
-            Debug.Log($"Bones {playerObject.GetComponentInChildren<SkinnedMeshRenderer>().bones.Count()}");
+            //Debug.Log($"Bones {playerObject.GetComponentInChildren<SkinnedMeshRenderer>().bones.Count()}");
 
 
             itemHolder.transform.localPosition = itemPositonOffset;
