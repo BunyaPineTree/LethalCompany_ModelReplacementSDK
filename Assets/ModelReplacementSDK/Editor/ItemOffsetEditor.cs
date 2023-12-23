@@ -41,12 +41,12 @@ public class OffsetBuilderEditor : Editor
         }
         EditorGUILayout.Separator();
         EditorGUILayout.LabelField("Controls");
-        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(OffsetBuilder.renderPlayer)));
-        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(OffsetBuilder.renderItem)));
-        if (GUILayout.Button("ReZero Model Position"))
+        t.renderPlayer = EditorGUILayout.Toggle("Render Preview Player", t.renderPlayer);
+        t.renderItem = EditorGUILayout.Toggle("Render Preview Item", t.renderItem);
+        if (GUILayout.Button("Reinitialize"))
         {
-            Undo.RecordObject(t, "Calculated root offset");
-            t.CalculateRootOffset();
+            Undo.RecordObject(t, "Reinitialized");
+            t.Initialize(true);
             EditorUtility.SetDirty(t);
         }
 
@@ -57,8 +57,8 @@ public class OffsetBuilderEditor : Editor
     public void OnSceneGUI()
     {
         OffsetBuilder t = (target as OffsetBuilder);
-        Transform handTransform = t.gameObject.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.RightHand);
-        Transform itemTransform = t.item.transform;
+        //Transform handTransform = t.gameObject.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.RightHand);
+        //Transform itemTransform = t.item.transform;
 
         Vector3 rootOff = t.rootPositionOffset;
         Vector3 rootSca = t.rootScale;
@@ -89,6 +89,7 @@ public class OffsetBuilderEditor : Editor
 
                 t.itemHolder.transform.SetPositionAndRotation(itemOff, t.itemHolder.transform.rotation);
                 t.itemPositonOffset = t.itemHolder.transform.localPosition;
+                
                 break;
             case Tool.Scale:
                 t.rootScale = rootSca;
