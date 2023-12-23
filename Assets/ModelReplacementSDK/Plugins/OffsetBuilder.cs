@@ -110,12 +110,12 @@ namespace ModelReplacement.AvatarBodyUpdater
         void Start()
         {
             if (playerObject != null) { return; }
-            UnityEngine.Object pPrefab = AssetDatabase.LoadAssetAtPath("Assets/ModelReplacementAPI/Player.prefab", typeof(GameObject)); 
-            UnityEngine.Object wPrefab = AssetDatabase.LoadAssetAtPath("Assets/ModelReplacementAPI/WalkieTalkie.prefab", typeof(GameObject));
-            UnityEngine.Object hPrefab = AssetDatabase.LoadAssetAtPath("Assets/ModelReplacementAPI/Scavenger.prefab", typeof(GameObject));
-            playerObject = (GameObject)PrefabUtility.InstantiatePrefab(pPrefab);
-            item = (GameObject)PrefabUtility.InstantiatePrefab(wPrefab);
-            playerHumanoid = (GameObject)PrefabUtility.InstantiatePrefab(hPrefab);
+            UnityEngine.Object playerPrefab = AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath("b9abac1e5ff1cb94483598ed4877ae91"), typeof(GameObject)); 
+            UnityEngine.Object walkieTalkiePrefab = AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath("7e73454e50f98f347aaea162c4ebe382"), typeof(GameObject));
+            UnityEngine.Object scavengerPrefab = AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath("a024259985699eb4fb6d4585e872c37c"), typeof(GameObject));
+            playerObject = (GameObject)PrefabUtility.InstantiatePrefab(playerPrefab);
+            item = (GameObject)PrefabUtility.InstantiatePrefab(walkieTalkiePrefab);
+            playerHumanoid = (GameObject)PrefabUtility.InstantiatePrefab(scavengerPrefab);
             playerObject.name = playerObject.name + $"({base.name})";
             item.name = item.name + $"({base.name})";
             playerHumanoid.name = playerHumanoid.name + $"({base.name})";
