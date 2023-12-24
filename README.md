@@ -9,6 +9,15 @@ How to Install
 - Hit *"Add package from git url..."*, then punch the following in: `https://github.com/BunyaPineTree/LethalCompany_ModelReplacementSDK.git#upm`
 - Make sure to update it regularly by hitting the "Update" button!
 
+Current Functionality
+-
+A unity editor based workflow that:
+- Has a "Setup Model" button that automatically assigns all of the necessary components to a humanoid model
+- Automatically calculates your model's position offset, scale, and rotation offsets on each bone to match the scavenger.
+- Has interaction handles to position a held item's position offset.
+- Has an inspector window that allows you to set assetbundle names, prefab names, and has buttons for reinitializing the character and building assetbundles
+- Has native support for a modified version of [UnityJigglePhysics](https://github.com/naelstrof/UnityJigglePhysics) to simplify the creation of models with bone physics. 
+
 Planned Functionality
 -
 A "Setup Project" button that performs the following
