@@ -13,17 +13,12 @@ namespace ModelReplacement.AvatarBodyUpdater
     [ExecuteInEditMode]
     [AddComponentMenu("Model Replacement Properties")]
     public class OffsetBuilder : MonoBehaviour {
-        private bool initializedPreview => playerObject != null && item != null;
         
-        [HideInInspector][SerializeField]
-        private bool initialized;
         
         public Vector3 rootPositionOffset = new Vector3(0, 0, 0);
-        [HideInInspector]
         public Vector3 rootScale = new Vector3(1, 1, 1);
-        public Vector3 itemPositonOffset = new Vector3(0.002728224f, 0.009688641f, -0.05092087f);
-        public Quaternion itemRotationOffset = Quaternion.Euler(328.5828f, 4.848449f, 350.3954f);
-        [HideInInspector]
+        public Vector3 itemPositonOffset = new Vector3(0, 0, 0);
+        public Quaternion itemRotationOffset = Quaternion.identity;
         public GameObject itemHolder;
 
 #if UNITY_EDITOR // => Ignore from here to next endif if not in editor
@@ -32,6 +27,12 @@ namespace ModelReplacement.AvatarBodyUpdater
         public GameObject playerObject;
         [HideInInspector]
         public GameObject item;
+
+        private bool initializedPreview => playerObject != null && item != null;
+
+        [HideInInspector]
+        [SerializeField]
+        private bool initialized;
 
         public bool renderPlayer {
             get => playerObject.GetComponentInChildren<SkinnedMeshRenderer>().enabled;
@@ -89,6 +90,7 @@ namespace ModelReplacement.AvatarBodyUpdater
                 playerObject = (GameObject)PrefabUtility.InstantiatePrefab(playerPrefab);
                 playerObject.hideFlags = HideFlags.DontSave;
             }
+            renderPlayer = false;
 
             if (item == null)
             {
@@ -197,30 +199,7 @@ namespace ModelReplacement.AvatarBodyUpdater
         }
 
         public Vector3 baseScale = Vector3.one;
-        public static List<string> DontCalculateOffset = new List<string>()
-        {
-                "finger5.L" ,
-                "finger5.L.001" ,
-                "finger4.L" ,
-                "finger4.L.001" ,
-                "finger3.L" ,
-                "finger3.L.001" ,
-                "finger2.L" ,
-                "finger2.L.001" ,
-                "finger1.L" ,
-                "finger1.L.001" ,
-                "finger5.R" ,
-                "finger5.R.001" ,
-                "finger4.R" ,
-                "finger4.R.001" ,
-                "finger3.R" ,
-                "finger3.R.001" ,
-                "finger2.R" ,
-                "finger2.R.001" ,
-                "finger1.R" ,
-                "finger1.R.001" ,
-
-        };
+       
 
         public void CalculateScale()
         {
@@ -264,7 +243,7 @@ namespace ModelReplacement.AvatarBodyUpdater
                 if (modelBone == null) { continue; }
 
                 Vector3 playerfoot = ScavengerGetter.Get().GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.LeftToes).position;
-                Vector3 modelFoot = GetAvatarLowestTransform().position + playerBone.TransformVector(rootPositionOffset);
+                Vector3 modelFoot = GetAvatarLowestTransform().position - playerBone.TransformVector(rootPositionOffset);
                 Vector3 diff = playerfoot - modelFoot;
                 diff.x = 0f;
                 rootPositionOffset = playerBone.InverseTransformVector(diff);
@@ -282,13 +261,14 @@ namespace ModelReplacement.AvatarBodyUpdater
 
 
             itemHolder.transform.localPosition = itemPositonOffset;
+            Transform playerItemHolder = GetPlayerItemHolder();
 
 
-            item.transform.rotation = itemHolder.transform.rotation * itemRotationOffset;
+            item.transform.rotation = playerItemHolder.rotation;
             item.transform.Rotate(new Vector3(30.01f, 5.9f, 12.54f));
             item.transform.position = itemHolder.transform.position;
             Vector3 vector = new Vector3(-0.012f, 0.085f, 0.01f) * 50;
-            vector = itemHolder.transform.rotation * vector;
+            vector = playerItemHolder.rotation * vector;
             item.transform.position += vector;
 
             foreach (Transform playerBone in playerObject.GetComponentInChildren<SkinnedMeshRenderer>().bones)
@@ -374,6 +354,13 @@ namespace ModelReplacement.AvatarBodyUpdater
 
         }
 
+        public Transform GetPlayerItemHolder()
+        {
+            var tr = playerObject.GetComponentsInChildren<Transform>().Where(x => (x.name == "ServerItemHolder") || (x.name == "ItemHolder"));
+            if(tr.Any()) { return tr.First(); }
+            return null;
+        }
+
         //Remove spine.002 and .003 to implement logic
         public static Dictionary<string, HumanBodyBones> modelToAvatarBone = new Dictionary<string, HumanBodyBones>()
             {
@@ -425,7 +412,6 @@ namespace ModelReplacement.AvatarBodyUpdater
                 {"foot.R" , HumanBodyBones.RightFoot},
                 {"toe.R" , HumanBodyBones.RightToes},
         };
-
 #endif
     }
 
