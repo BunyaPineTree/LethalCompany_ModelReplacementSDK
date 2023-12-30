@@ -5,6 +5,7 @@ A SDK to simplify creating character model replacements in Lethal Company. [See 
 How to Install
 -
 - Have Unity 2022.3.9f1 installed, with a new HDRP project open.
+- Have [Git installed.](https://git-scm.com/downloads)
 - Open the Package Manager within Unity by hitting Window->Package Manager at the top.
 - Hit *"Add package from git url..."*, then punch the following in: `https://github.com/BunyaPineTree/LethalCompany_ModelReplacementSDK.git#upm`
 - Make sure to update it regularly by hitting the "Update" button!
