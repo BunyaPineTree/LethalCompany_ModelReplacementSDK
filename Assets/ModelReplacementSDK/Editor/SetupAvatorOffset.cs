@@ -44,21 +44,4 @@ namespace Assets.Editor
         }
     }
 
-    public class BuildBundles
-    {
-        [MenuItem("ModelReplacementSDK/Build AssetBundles")]
-        static void setupModel()
-        {
-
-            string assetBundleDirectory = "Assets/AssetBundles";
-            if (!Directory.Exists(assetBundleDirectory))
-            {
-                Directory.CreateDirectory(assetBundleDirectory);
-            }
-            BuildPipeline.BuildAssetBundles(assetBundleDirectory, BuildAssetBundleOptions.None, BuildTarget.StandaloneWindows);
-            EditorUtility.RevealInFinder(assetBundleDirectory + "/");
-        }
-
-
-    }
 }
