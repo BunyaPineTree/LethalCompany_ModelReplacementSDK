@@ -3,13 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
 #if UNITY_EDITOR // => Ignore from here to next endif if not in editor
+using Unity.VisualScripting.YamlDotNet.Core.Tokens;
 using UnityEditor;
+using UnityEditor.SearchService;
 #endif
 using UnityEngine;
 
 namespace ModelReplacement.AvatarBodyUpdater
 {
+    [Serializable]
     [ExecuteInEditMode]
     [AddComponentMenu("Model Replacement Properties")]
     public class OffsetBuilder : MonoBehaviour {
@@ -20,6 +24,7 @@ namespace ModelReplacement.AvatarBodyUpdater
         public Vector3 itemPositonOffset = new Vector3(0, 0, 0);
         public Quaternion itemRotationOffset = Quaternion.identity;
         public GameObject itemHolder;
+        public bool UseNoPostProcessing = false;
 
 #if UNITY_EDITOR // => Ignore from here to next endif if not in editor
         public Transform rootTransform => GetPlayerTransformFromBoneName("spine");
@@ -43,31 +48,62 @@ namespace ModelReplacement.AvatarBodyUpdater
             set => item.GetComponentInChildren<Renderer>().enabled = value;
         }
 
-        public string assetBundleName = "";
+        private ModelReplacementProject prevProject;
+        public ModelReplacementProject Project;
+  
         public string assetName = "";
-       
-        private IEnumerator SaveAssetBundle()
+        public string assetPath = "";
+
+        private void OnValidate()
         {
-            if (assetBundleName == "")
+            if(Project == prevProject) { return; }
+            if(prevProject != null) { prevProject.ReportPrefabRemoval(this); }
+            prevProject = Project;
+            if (Project != null) { Project.ReportPrefabAddition(this); }
+        }
+
+        public void SavePrefab2()
+        {
+            if (!Directory.Exists("Assets/ModelReplacementSDK/AssetsToBuild"))
             {
-                Debug.LogError($"Asset Bundle Name must be set");
-                yield break; 
+                Directory.CreateDirectory("Assets/ModelReplacementSDK/AssetsToBuild");
             }
-            if (assetName == "")
-            {
-                Debug.LogError($"Asset Name must be set");
-                yield break; 
-            }
+            assetPath = "Assets/ModelReplacementSDK/AssetsToBuild/" + assetName + ".prefab";
+            PrefabUtility.SaveAsPrefabAsset(gameObject, assetPath);
+
+        }
+
+
+        public IEnumerator SavePrefab()
+        {
             yield return null;
             if (!Directory.Exists("Assets/ModelReplacementSDK/AssetsToBuild"))
             {
                 Directory.CreateDirectory("Assets/ModelReplacementSDK/AssetsToBuild");
             }
-            string AssetPath = "Assets/ModelReplacementSDK/AssetsToBuild/" + assetName + ".prefab";
-            PrefabUtility.SaveAsPrefabAsset(gameObject, AssetPath);
+            assetPath = "Assets/ModelReplacementSDK/AssetsToBuild/" + assetName + ".prefab";
+            PrefabUtility.SaveAsPrefabAsset(gameObject, assetPath);
             yield return null;
+        }
+        public void SaveAssetBundles()
+        {
+            StartCoroutine(SaveAssetBundle());
+        }
 
-            AssetImporter assetImporter = AssetImporter.GetAtPath(AssetPath);
+        private IEnumerator SaveAssetBundle()
+        {
+            string assetBundleName = "mrapi_assetbundle";
+
+            if(Project != null) { yield break; }
+            if (assetName == "")
+            {
+                Debug.LogError($"Asset Name must be set");
+                yield break; 
+            }
+           
+            yield return SavePrefab();
+
+            AssetImporter assetImporter = AssetImporter.GetAtPath(assetPath);
             assetImporter.assetBundleName = assetBundleName;
 
             string assetBundleDirectory = "Assets/AssetBundles";
@@ -90,7 +126,8 @@ namespace ModelReplacement.AvatarBodyUpdater
                 playerObject = (GameObject)PrefabUtility.InstantiatePrefab(playerPrefab);
                 playerObject.hideFlags = HideFlags.DontSave;
             }
-            renderPlayer = false;
+            if(playerObject != null) { renderPlayer = false; }
+           
 
             if (item == null)
             {
@@ -174,10 +211,6 @@ namespace ModelReplacement.AvatarBodyUpdater
             }
         }
 
-        public void SaveAssetBundles()
-        {
-            StartCoroutine(SaveAssetBundle());
-        }
 
         public Animator animator;
         public bool hasUpperChest = false;
@@ -254,8 +287,9 @@ namespace ModelReplacement.AvatarBodyUpdater
         void Update() {
             if (!initializedPreview) { return; }
             // PopulateFingers();
-            playerObject.GetComponentInChildren<SkinnedMeshRenderer>().enabled = renderPlayer;
-            item.GetComponentInChildren<Renderer>().enabled = renderItem;
+            if (playerObject != null) { playerObject.GetComponentInChildren<SkinnedMeshRenderer>().enabled = renderPlayer; }
+            if (item != null){ item.GetComponentInChildren<Renderer>().enabled = renderItem; }
+                
             CalculateScale();
             animator = GetComponentInChildren<Animator>();
 
