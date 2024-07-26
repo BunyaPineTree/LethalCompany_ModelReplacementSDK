@@ -10,6 +10,7 @@ using UnityEditor;
 using UnityEditor.SearchService;
 #endif
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace ModelReplacement.AvatarBodyUpdater
 {
@@ -183,8 +184,8 @@ namespace ModelReplacement.AvatarBodyUpdater
                 }
             }
 
-            ScavengerGetter.Get().GetComponentInChildren<Animator>().avatar.humanDescription.skeleton.ToList().ForEach(MapSkeletonBones);
-            animator.avatar.humanDescription.skeleton.ToList().ForEach(MapSkeletonBones);
+            ForceRestPose(ScavengerGetter.Get().GetComponentInChildren<Animator>());
+            ForceRestPose(animator);
             
             // PopulateFingers();
             baseScale = Vector3.one;
@@ -198,16 +199,26 @@ namespace ModelReplacement.AvatarBodyUpdater
             initialized = true;
         }
 
-        private void MapSkeletonBones(SkeletonBone sk)
+        private void ForceRestPose(Animator animator)
         {
-            var matchingTransforms = GetComponentsInChildren<Transform>().Where(x => x.name == sk.name);
-            if (matchingTransforms.Any())
+            IEnumerable<Transform> childTransforms = animator.transform.root.GetComponentsInChildren<Transform>()
+                .Skip(1); // Skip root transform
+            foreach (var sk in animator.avatar.humanDescription.skeleton.Skip(1)) // Skip root bone
             {
-                matchingTransforms.First().localRotation = sk.rotation;
-            }
-            else
-            {
-                Debug.Log($"Missing bone {sk.name}");
+                var matchingTransforms = ListPool<Transform>.Get();
+                matchingTransforms.AddRange(childTransforms.Where(x => x.name == sk.name));
+                if (matchingTransforms.Count > 0)
+                {
+                    if (matchingTransforms.Count > 1)
+                    {
+                        Debug.LogWarning($"Ambiguous match: bone '{sk.name}' matches multiple transforms");
+                    }
+                    matchingTransforms[0].localRotation = sk.rotation;
+                }
+                else
+                {
+                    Debug.LogWarning($"Missing bone {sk.name}");
+                }
             }
         }
 
